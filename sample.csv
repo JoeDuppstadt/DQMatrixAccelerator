@@ -1,0 +1,4 @@
+name_col,phone_col,email_col,addr_col,city_col,state_col,zip_col,country_col
+John Doe,555-123-4567,john@example.com,123 Main St,New York,NY,12345,United States
+Jane Smith,555-234-5678,jane@example.com,456 Oak Rd,Boston,MA,02108,United States
+Bob Johnson,555-345-6789,bob@example.com,789 Pine Ave,Chicago,IL,60601,United States
