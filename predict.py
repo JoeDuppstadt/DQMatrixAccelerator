@@ -78,8 +78,11 @@ def predict(csv_file=None):
             column_predictions[column].append((prediction, confidence))
 
     # Calculate consensus for each column and print result
+    predictions_dic = {}
     for column in column_predictions:
         if column_predictions[column]:  # Only process if there are predictions
             predictions = [pred for pred, _ in column_predictions[column]]
             consensus = Counter(predictions).most_common(1)[0][0]  # Most common prediction
             print(f"Column: {column} -> Predicted Type: {consensus}")
+            predictions_dic[column] = consensus
+    return predictions_dic
