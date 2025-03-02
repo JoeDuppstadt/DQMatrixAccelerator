@@ -1,5 +1,3 @@
-import os
-
 import pandas as pd
 from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
 from services import datamanager
@@ -10,8 +8,76 @@ output_file = 'DQMatrixOut.xlsx'
 def remove_digits(text):
     return re.sub(r"\d", "", text)
 
+def check_for_merge(worksheet, match_start, length):
+    if length > 0:
+        #todo initiate merge
+        print(worksheet.cell(row=1, column=match_start).value)
+        print(worksheet.cell(row=1, column=match_start + length).value)
 
-def build_excel_sheet(sheet_name, name_cols, num_cols, phone_cols):
+def generate_dynamic_attribute_rows(data, name_cols, phone_cols, num_cols, address_cols, city_cols, state_cols, postal_cols, email_cols):
+    # generate name columns
+    for i in range(0, len(name_cols)):
+        data['name cols' + str(i)] = [name_cols[i], 'TRUE', '', '', 'TRUE', '', 'TRUE', '', '', '', '', '']
+
+    # generate number columns
+    for i in range(0, len(num_cols) + len(phone_cols)):
+        if i < len(num_cols):
+            data['number cols' + str(i)] = [num_cols[i], 'TRUE', 'TRUE', '', '', '', 'TRUE', '', '', '', 'TRUE', '']
+        else:
+            # generate phone number columns
+            for j in range(0, len(phone_cols)):
+                data['number cols' + str(i)] = [phone_cols[j], 'TRUE', 'TRUE', '', '', '', 'TRUE', '', '', '', 'TRUE',
+                                                '']
+            break
+    # generate address columns
+    for i in range(0, len(address_cols) + len(city_cols) + len(state_cols) + len(postal_cols)):
+        print()
+        if i < len(address_cols):
+            data['addr_other_cols' + str(i)] = [address_cols[i], 'TRUE', '', '', '', '', 'TRUE', '', '', '', '', 'TRUE']
+        elif i < len(address_cols) + len(city_cols):
+            # generate city columns
+            for j in range(0, len(city_cols)):
+                data['addr_other_cols' + str(i)] = [city_cols[j], 'TRUE', '', '', '', '', 'TRUE', '', '', '', '','TRUE']
+        elif i < len(address_cols) + len(city_cols) + len(state_cols):
+            # generate state columns
+            for j in range(0, len(state_cols)):
+                data['addr_other_cols' + str(i)] = [state_cols[j], '', '', '', '', '', 'TRUE', '', 'TRUE', '', '','']
+        elif i < len(address_cols) + len(city_cols) + len(state_cols) + len(postal_cols):
+            # generate postal columns
+            for j in range(0, len(postal_cols)):
+                data['addr_other_cols' + str(i)] = [postal_cols[j], 'TRUE', '', '', 'TRUE', '', 'TRUE', '', '', '', '','']
+            break
+    # generate email columns
+    for i in range(0, len(email_cols)):
+        data['email_cols' + str(i)] = [email_cols[j], 'TRUE', '', 'TRUE', '', '', 'TRUE', '', '', '', 'TRUE', '']
+    return data
+
+def merge_engine(worksheet):
+    i = 2
+    j = 1
+    length = 0
+    match_start = 0
+    while worksheet.cell(row=1, column=i).value is not None:
+        # use 2 pointer notation to iterate over column headers
+        prev_value = remove_digits(worksheet.cell(row=1, column=j).value)
+        curr_value = remove_digits(worksheet.cell(row=1, column=i).value)
+
+        if prev_value == curr_value:  # if a match is found
+            i = i + 1  # move runner + 1 to check next value
+            match_start = j  # update match start
+            length = length + 1  # increment match length
+        else:  # if a match is not found or had ended
+            check_for_merge(worksheet, match_start, length)  # check to see if the length is > 1. If so initiate a merge
+            j = i
+            i = i + 1
+            length = 0
+
+    # check for merges after iteration
+    check_for_merge(worksheet, match_start, length)
+
+
+def build_excel_sheet(sheet_name, name_cols, num_cols, phone_cols, address_cols, city_cols, state_cols, postal_cols, email_cols):
+    # build data dic for static columns
     data = {
         'Workflow': ['Rule Num', 'DQ-1', 'DQ-2', 'DQ-3', 'DQ-4', 'DQ-5', 'DQ-6', 'DQ-7', 'DQ-8', 'DQ-9', 'DQ-10',
                      'DQ-11'],
@@ -20,22 +86,10 @@ def build_excel_sheet(sheet_name, name_cols, num_cols, phone_cols):
                                 'Remove Special Characters', 'Standardize State codes', 'Standardize Country Codes',
                                 'Remove White Space', 'Title case'],
     }
+    generate_dynamic_attribute_rows(data, name_cols, phone_cols, num_cols, address_cols, city_cols, state_cols, postal_cols, email_cols)
 
-    #generate name columns
-    for i in range(0, len(name_cols)):
-        data['name cols' + str(i)] = [name_cols[i], 'TRUE', '', '', 'TRUE', '', 'TRUE', '', '', '', '', '']
-
-    #generate number columns
-    for i in range(0, len(num_cols) + len(phone_cols)):
-        if i < len(num_cols):
-            data['number cols' + str(i)] = [num_cols[i], 'TRUE', 'TRUE', '', '', '', 'TRUE', '', '', '', 'TRUE', '']
-        else:
-            for j in range(0, len(phone_cols)):
-                data['number cols' + str(i)] = [phone_cols[j], 'TRUE', 'TRUE', '', '', '', 'TRUE', '', '', '', 'TRUE', '']
-            break
     # Create DataFrame
     df = pd.DataFrame(data)
-
 
     # Save to Excel file
     datamanager.write_to_excel(df, output_file, sheet_name)
@@ -43,31 +97,8 @@ def build_excel_sheet(sheet_name, name_cols, num_cols, phone_cols):
     workbook = datamanager.load_excel(output_file)
     worksheet = workbook[sheet_name]
 
-    i = 2
-    j = 1
-    length = 0
-    match_start = 0
-    while worksheet.cell(row=1, column=i).value is not None:
-        print('j: ' + worksheet.cell(row=1, column=j).value + ':' + str(j))
-        print('i: ' + worksheet.cell(row=1, column=i).value + ':' + str(i))
-        prev_value = remove_digits(worksheet.cell(row=1, column=j).value)
-        curr_value = remove_digits(worksheet.cell(row=1, column=i).value)
+    merge_engine(worksheet) # check to see if header columns need merged
 
-        if prev_value == curr_value:
-            i = i + 1
-            match_start = j
-            length = length + 1
-            print('Match: ' + str(length))
-        else:
-            # if length > 0:
-            #     print(worksheet.cell(row=1, column=match_start).value)
-            #     print(worksheet.cell(row=1, column=match_start + length).value)
-            j = i
-            i = i + 1
-            length = 0
-        print('end')
-    # print(match_start)
-    # print(length)
 
 
 def build_definition_sheet():

@@ -4,12 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a0e20dfd-0777-4b16-aa53-8c69c76449a3" name="Changes" comment="Added hardcoded logic for state and country">
-      <change afterPath="$PROJECT_DIR$/services/build_excel_sheet.py" afterDir="false" />
+    <list default="true" id="a0e20dfd-0777-4b16-aa53-8c69c76449a3" name="Changes" comment="Updated merging logic">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/predict.py" beforeDir="false" afterPath="$PROJECT_DIR$/predict.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/datamanager.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/datamanager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/build_excel_sheet.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/build_excel_sheet.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,12 +112,21 @@
       <option name="project" value="LOCAL" />
       <updated>1740780226602</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Updated merging logic">
+      <option name="closed" value="true" />
+      <created>1740935172234</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1740935172234</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initial" />
     <MESSAGE value="Added hardcoded logic for state and country" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added hardcoded logic for state and country" />
+    <MESSAGE value="Updated merging logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated merging logic" />
   </component>
 </project>

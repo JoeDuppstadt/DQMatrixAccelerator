@@ -13,13 +13,18 @@ if __name__ == "__main__":
     file_locations, file_names = datamanager.get_inbound_file_list()
 
 
-    for i in range(0, len(file_locations)-1):
+    for i in range(0, len(file_locations)):
         prediction_dic = predict(file_locations[i])
         names = sort_predictions('Name', prediction_dic)
         numbers = sort_predictions('Number', prediction_dic)
         phones = sort_predictions('Phone', prediction_dic)
-        #if i == 0: # build the definition sheet on first iteration
-        #    build_excel_sheet.build_definition_sheet()
+        addresses = sort_predictions('Address', prediction_dic)
+        cities = sort_predictions('City', prediction_dic)
+        states = sort_predictions('State', prediction_dic)
+        postal_codes = sort_predictions('Zip', prediction_dic)
+        emails = sort_predictions('Email', prediction_dic)
+        if i == 0: # build the definition sheet on first iteration
+            build_excel_sheet.build_definition_sheet()
 
-        build_excel_sheet.build_excel_sheet(file_names[i], names, numbers, phones)
+        build_excel_sheet.build_excel_sheet(file_names[i], names, numbers, phones, addresses, cities, states, postal_codes, emails)
 
