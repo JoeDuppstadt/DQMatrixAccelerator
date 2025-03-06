@@ -21,10 +21,12 @@ if __name__ == "__main__":
         addresses = sort_predictions('Address', prediction_dic)
         cities = sort_predictions('City', prediction_dic)
         states = sort_predictions('State', prediction_dic)
+        countries = sort_predictions('Country', prediction_dic)
         postal_codes = sort_predictions('Zip', prediction_dic)
         emails = sort_predictions('Email', prediction_dic)
+        unknown = sort_predictions('Unknown', prediction_dic)
         if i == 0: # build the definition sheet on first iteration
             build_excel_sheet.build_definition_sheet()
 
-        build_excel_sheet.build_excel_sheet(file_names[i], names, numbers, phones, addresses, cities, states, postal_codes, emails)
+        build_excel_sheet.build_excel_sheet(file_names[i], names, numbers, phones, addresses, cities, states, countries, postal_codes, emails, unknown)
 

@@ -17,6 +17,10 @@ def preprocess(text):
     text_str = str(text) if pd.notnull(text) else ""
     return text_str.lower().strip()
 
+def is_valid_zip_code(input_str):
+    # Check for 5-digit or 9-digit ZIP+4 format
+    return bool(re.match(r'^\d{5}(-\d{4})?$', input_str))
+
 # Load training data from CSV
 training_csv_path = r"assets/trainingdata.csv"  # Path to training CSV
 df_train = pd.read_csv(training_csv_path)
@@ -57,22 +61,30 @@ def predict_input_type(user_input):
     elif user_input.upper() in country_abbreviations or user_input.upper() in country_full_names:
         prediction = "Country"
         confidence = 1.0  # Assign high confidence to rule-based decision
+    elif is_valid_zip_code(processed_input):
+        prediction = "Zip"
+        confidence = 1.0  # Assign high confidence to rule-based decision
     else:
         prediction = pipeline.predict([processed_input])[0]
         confidence = max(pipeline.predict_proba([processed_input])[0])
+        if confidence < .30:
+            prediction = 'Unknown'
+    print(user_input)
+    print(prediction)
+    print(confidence)
     return prediction, confidence
 
 # Test the model with dynamic CSV column consensus
-def predict(csv_file=None):
-    test_df = pd.read_csv(csv_file)
+def predict(csv_file):
+    df = pd.read_csv(csv_file)
     print(f"\nColumn consensus from CSV file: {csv_file}")
 
     # Dictionary to store predictions for each column
-    column_predictions = {col: [] for col in test_df.columns}
+    column_predictions = {col: [] for col in df.columns}
 
     # Collect predictions for each non-null value in each column
-    for column in test_df.columns:
-        non_null_values = test_df[column].dropna()
+    for column in df.columns:
+        non_null_values = df[column].dropna()
         for value in non_null_values:
             prediction, confidence = predict_input_type(value)
             column_predictions[column].append((prediction, confidence))

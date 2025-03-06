@@ -1,20 +1,23 @@
 import pandas as pd
 from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
+from openpyxl.utils import get_column_letter
+
 from services import datamanager
 import re
+import assets.colors
 
 output_file = 'DQMatrixOut.xlsx'
 
 def remove_digits(text):
     return re.sub(r"\d", "", text)
 
-def check_for_merge(worksheet, match_start, length):
-    if length > 0:
-        #todo initiate merge
-        print(worksheet.cell(row=1, column=match_start).value)
-        print(worksheet.cell(row=1, column=match_start + length).value)
+def return_pattern_fill(color):
+    return PatternFill(start_color=color,  end_color=color,fill_type='solid')
 
-def generate_dynamic_attribute_rows(data, name_cols, phone_cols, num_cols, address_cols, city_cols, state_cols, postal_cols, email_cols):
+def check_for_merge(worksheet, track_merges, match_start, length):
+    if length > 0:
+        track_merges[worksheet.cell(row=1, column=match_start).value] = [match_start, match_start + length]
+def generate_dynamic_attribute_rows(data, name_cols, phone_cols, num_cols, address_cols, city_cols, state_cols, country_cols, postal_cols, email_cols, unknown_cols):
     # generate name columns
     for i in range(0, len(name_cols)):
         data['name cols' + str(i)] = [name_cols[i], 'TRUE', '', '', 'TRUE', '', 'TRUE', '', '', '', '', '']
@@ -30,26 +33,37 @@ def generate_dynamic_attribute_rows(data, name_cols, phone_cols, num_cols, addre
                                                 '']
             break
     # generate address columns
-    for i in range(0, len(address_cols) + len(city_cols) + len(state_cols) + len(postal_cols)):
-        print()
+    for i in range(0, len(address_cols) + len(city_cols) + len(state_cols) + len(country_cols) + len(postal_cols)):
         if i < len(address_cols):
             data['addr_other_cols' + str(i)] = [address_cols[i], 'TRUE', '', '', '', '', 'TRUE', '', '', '', '', 'TRUE']
         elif i < len(address_cols) + len(city_cols):
             # generate city columns
             for j in range(0, len(city_cols)):
                 data['addr_other_cols' + str(i)] = [city_cols[j], 'TRUE', '', '', '', '', 'TRUE', '', '', '', '','TRUE']
+                i = i + 1
         elif i < len(address_cols) + len(city_cols) + len(state_cols):
             # generate state columns
             for j in range(0, len(state_cols)):
                 data['addr_other_cols' + str(i)] = [state_cols[j], '', '', '', '', '', 'TRUE', '', 'TRUE', '', '','']
-        elif i < len(address_cols) + len(city_cols) + len(state_cols) + len(postal_cols):
+                i = i + 1
+        elif i < len(address_cols) + len(city_cols) + len(state_cols) + len(country_cols):
+            # generate country columns
+            for j in range(0, len(country_cols)):
+                data['addr_other_cols' + str(i)] = [country_cols[j], '', '', '', 'TRUE', 'TRUE', 'TRUE', '', '', 'TRUE', '','']
+                i = i + 1
+        elif i < len(address_cols) + len(city_cols) + len(state_cols) + len(country_cols) + len(postal_cols):
             # generate postal columns
             for j in range(0, len(postal_cols)):
                 data['addr_other_cols' + str(i)] = [postal_cols[j], 'TRUE', '', '', 'TRUE', '', 'TRUE', '', '', '', '','']
+                i = i + 1
             break
     # generate email columns
     for i in range(0, len(email_cols)):
-        data['email_cols' + str(i)] = [email_cols[j], 'TRUE', '', 'TRUE', '', '', 'TRUE', '', '', '', 'TRUE', '']
+        data['email_cols' + str(i)] = [email_cols[i], 'TRUE', '', 'TRUE', '', '', 'TRUE', '', '', '', 'TRUE', '']
+
+    # generate unknown columns
+    for i in range(0, len(unknown_cols)):
+        data['unknown_cols' + str(i)] = [unknown_cols[i], '', '', '', '', '', '', '', '', '', '', '']
     return data
 
 def merge_engine(worksheet):
@@ -57,6 +71,7 @@ def merge_engine(worksheet):
     j = 1
     length = 0
     match_start = 0
+    track_merges = {}
     while worksheet.cell(row=1, column=i).value is not None:
         # use 2 pointer notation to iterate over column headers
         prev_value = remove_digits(worksheet.cell(row=1, column=j).value)
@@ -67,26 +82,39 @@ def merge_engine(worksheet):
             match_start = j  # update match start
             length = length + 1  # increment match length
         else:  # if a match is not found or had ended
-            check_for_merge(worksheet, match_start, length)  # check to see if the length is > 1. If so initiate a merge
+            check_for_merge(worksheet, track_merges, match_start, length)  # check to see if the length is > 1. If so initiate a merge
             j = i
             i = i + 1
             length = 0
 
     # check for merges after iteration
-    check_for_merge(worksheet, match_start, length)
+    check_for_merge(worksheet, track_merges, match_start, length)
+
+    #standardize column headers
+    i = 1
+    while worksheet.cell(row=1, column=i).value is not None:
+        worksheet.cell(row=1, column=i, value=remove_digits(worksheet.cell(row=1, column=i).value)) # update header names
+        i = i + 1
+
+    for row, cols in track_merges.items():
+        start_col, end_col = cols
+        worksheet.merge_cells(start_row=1, start_column=start_col,
+                       end_row=1, end_column=end_col) #merge columns
 
 
-def build_excel_sheet(sheet_name, name_cols, num_cols, phone_cols, address_cols, city_cols, state_cols, postal_cols, email_cols):
+
+
+def build_excel_sheet(sheet_name, name_cols, num_cols, phone_cols, address_cols, city_cols, state_cols, country_cols, postal_cols, email_cols, unknown_cols):
     # build data dic for static columns
     data = {
         'Workflow': ['Rule Num', 'DQ-1', 'DQ-2', 'DQ-3', 'DQ-4', 'DQ-5', 'DQ-6', 'DQ-7', 'DQ-8', 'DQ-9', 'DQ-10',
                      'DQ-11'],
-        'transformation type': ['DQ rule name', 'Trim', 'Remove Non-numeric characters', 'Lower case', 'Upper case',
+        'Transformation Type': ['DQ rule name', 'Trim', 'Remove Non-numeric characters', 'Lower case', 'Upper case',
                                 'Remove numeric characters', 'Standardize blank values to Null',
                                 'Remove Special Characters', 'Standardize State codes', 'Standardize Country Codes',
                                 'Remove White Space', 'Title case'],
     }
-    generate_dynamic_attribute_rows(data, name_cols, phone_cols, num_cols, address_cols, city_cols, state_cols, postal_cols, email_cols)
+    generate_dynamic_attribute_rows(data, name_cols, phone_cols, num_cols, address_cols, city_cols, state_cols, country_cols, postal_cols, email_cols, unknown_cols)
 
     # Create DataFrame
     df = pd.DataFrame(data)
@@ -98,6 +126,39 @@ def build_excel_sheet(sheet_name, name_cols, num_cols, phone_cols, address_cols,
     worksheet = workbook[sheet_name]
 
     merge_engine(worksheet) # check to see if header columns need merged
+
+    border_style = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+    # Iterate over all rows
+    for i in range (1, len(list(worksheet.rows)) + 1):
+        if i == 1:
+            for k in range(0, len(list(worksheet[i])) - 1):
+                worksheet[i][k].fill = return_pattern_fill('C9DAF8')
+                worksheet[i][k].border = border_style
+        elif i % 2 != 0:
+            for k in range(0, len(list(worksheet[i])) - 1):
+                worksheet[i][k].fill = return_pattern_fill('BFBFBF')
+                worksheet[i][k].border = border_style
+        else:
+            for k in range(0, len(list(worksheet[i])) - 1):
+                worksheet[i][k].border = border_style
+
+    column_widths = {}
+    for row in worksheet.rows:
+        for cell in row:
+            if cell.value:
+                col_letter = get_column_letter(cell.column)
+                cell_length = len(str(cell.value).strip())
+                column_widths[col_letter] = max(column_widths.get(col_letter, 0), cell_length)
+
+    for col_letter, width in column_widths.items():
+        worksheet.column_dimensions[col_letter].width = width + 2  # Padding
+
+    datamanager.save_excel_formating(workbook, output_file)
 
 
 
