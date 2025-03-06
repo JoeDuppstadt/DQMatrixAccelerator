@@ -4,13 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a0e20dfd-0777-4b16-aa53-8c69c76449a3" name="Changes" comment="built logic to create entire excel sheet with all columns instead of just name. Will need to merge headers and format the sheet">
-      <change afterPath="$PROJECT_DIR$/assets/colors.py" afterDir="false" />
+    <list default="true" id="a0e20dfd-0777-4b16-aa53-8c69c76449a3" name="Changes" comment="finished backend logic">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/trainingdata.csv" beforeDir="false" afterPath="$PROJECT_DIR$/assets/trainingdata.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/predict.py" beforeDir="false" afterPath="$PROJECT_DIR$/predict.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/build_excel_sheet.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/build_excel_sheet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/datamanager.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/datamanager.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -131,7 +130,15 @@
       <option name="project" value="LOCAL" />
       <updated>1740938514608</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="finished backend logic">
+      <option name="closed" value="true" />
+      <created>1741227767215</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1741227767215</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -150,6 +157,7 @@
     <MESSAGE value="Added hardcoded logic for state and country" />
     <MESSAGE value="Updated merging logic" />
     <MESSAGE value="built logic to create entire excel sheet with all columns instead of just name. Will need to merge headers and format the sheet" />
-    <option name="LAST_COMMIT_MESSAGE" value="built logic to create entire excel sheet with all columns instead of just name. Will need to merge headers and format the sheet" />
+    <MESSAGE value="finished backend logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="finished backend logic" />
   </component>
 </project>

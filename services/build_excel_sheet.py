@@ -4,7 +4,6 @@ from openpyxl.utils import get_column_letter
 
 from services import datamanager
 import re
-import assets.colors
 
 output_file = 'DQMatrixOut.xlsx'
 

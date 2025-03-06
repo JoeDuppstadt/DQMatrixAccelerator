@@ -22,7 +22,6 @@ def get_reference_data(location):
 
 def write_to_excel(data, output_file, sheet_name):
     file_location = os.path.join(directory, output_file)
-    print(file_location)
     #append sheet to existing file
     if os.path.exists(file_location):
         # Load the existing workbook and append new sheet

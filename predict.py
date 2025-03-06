@@ -52,13 +52,13 @@ country_abbreviations, country_full_names = datamanager.get_reference_data('asse
 # Prediction function with debugging
 def predict_input_type(user_input):
     processed_input = preprocess(user_input)
-    if re.match(r'^\d+$', processed_input) and len(processed_input) < 5:
+    if re.match(r'^\d+$', processed_input) and len(processed_input) != 5:
         prediction = "Number"
         confidence = 1.0  # Assign high confidence to rule-based decision
-    elif user_input.upper() in state_abbreviations or user_input.upper() in state_full_names:
+    elif processed_input.upper() in state_abbreviations or processed_input.upper() in state_full_names:
         prediction = "State"
         confidence = 1.0  # Assign high confidence to rule-based decision
-    elif user_input.upper() in country_abbreviations or user_input.upper() in country_full_names:
+    elif processed_input.upper() in country_abbreviations or processed_input.upper() in country_full_names:
         prediction = "Country"
         confidence = 1.0  # Assign high confidence to rule-based decision
     elif is_valid_zip_code(processed_input):
@@ -69,14 +69,14 @@ def predict_input_type(user_input):
         confidence = max(pipeline.predict_proba([processed_input])[0])
         if confidence < .30:
             prediction = 'Unknown'
-    print(user_input)
-    print(prediction)
-    print(confidence)
+    #print(processed_input)
+    #print(prediction)
+    #print(confidence)
     return prediction, confidence
 
 # Test the model with dynamic CSV column consensus
 def predict(csv_file):
-    df = pd.read_csv(csv_file)
+    df = pd.read_csv(csv_file, dtype=str)
     print(f"\nColumn consensus from CSV file: {csv_file}")
 
     # Dictionary to store predictions for each column
