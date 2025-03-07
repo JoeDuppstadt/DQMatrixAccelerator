@@ -1,5 +1,4 @@
 import re
-
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
@@ -7,9 +6,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import classification_report
 from collections import Counter
-
 from services import datamanager
-
 
 # Preprocessing function
 def preprocess(text):
