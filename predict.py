@@ -50,25 +50,17 @@ country_abbreviations, country_full_names = datamanager.get_reference_data('asse
 def predict_input_type(user_input):
     processed_input = preprocess(user_input)
     if re.match(r'^\d+$', processed_input) and len(processed_input) != 5:
-        prediction = "Number"
-        confidence = 1.0  # Assign high confidence to rule-based decision
+        prediction, confidence = "Number", 1.0
     elif processed_input.upper() in state_abbreviations or processed_input.upper() in state_full_names:
-        prediction = "State"
-        confidence = 1.0  # Assign high confidence to rule-based decision
+        prediction, confidence = "State", 1.0
     elif processed_input.upper() in country_abbreviations or processed_input.upper() in country_full_names:
-        prediction = "Country"
-        confidence = 1.0  # Assign high confidence to rule-based decision
+        prediction, confidence = "Country", 1.0
     elif is_valid_zip_code(processed_input):
-        prediction = "Zip"
-        confidence = 1.0  # Assign high confidence to rule-based decision
+        prediction, confidence = "Zip", 1.0
     else:
-        prediction = pipeline.predict([processed_input])[0]
-        confidence = max(pipeline.predict_proba([processed_input])[0])
+        prediction, confidence = pipeline.predict([processed_input])[0], max(pipeline.predict_proba([processed_input])[0])
         if confidence < .30:
             prediction = 'Unknown'
-    #print(processed_input)
-    #print(prediction)
-    #print(confidence)
     return prediction, confidence
 
 # Test the model with dynamic CSV column consensus
